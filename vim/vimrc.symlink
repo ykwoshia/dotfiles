@@ -175,7 +175,7 @@ else
 
         else
             if has("mac")
-                set guifont=SourceCodePro\ 11
+                set guifont=Source\ Code\ Pro:h16
             else
                 set guifont=BitstreamVeraSansMono\ 11
             endif
@@ -200,11 +200,13 @@ set cursorcolumn
 
 set nowrap
 set shortmess=atI
-
-winpos 1250 0
-set lines=80 columns=100
-" set lines=500 columns=500
-
+if has("lua")
+    winpos 0 0
+    set lines=500 columns=500
+else
+    winpos 1250 0
+    set lines=80 columns=100
+endif
 
 " }}}2
 "  < Encoding Options > {{{2
@@ -263,10 +265,10 @@ set expandtab
 set tabstop=4
 set shiftwidth=4
 set smarttab
-set showtabline=0
 
 " ------------ backspace
-set backspace=2 " equal to :set backspace=indent,eol,start
+" equal to :set backspace=indent,eol,start
+set backspace=2
 
 
 
@@ -364,8 +366,10 @@ else
     " todo how to run in shell use % 10/16/16
     if g:isGUI
         nnoremap <Leader>e :update<CR>:!./%<CR>
+        nnoremap <Space>e :update<CR>:!./%<CR>
     else
         nnoremap <Leader>e :update<CR>:S ./*.pl*<CR>
+        nnoremap <Space>e :update<CR>:S ./*.pl*<CR>
     endif
 endif
 " nnoremap <Leader>e :update<CR>:!make<CR>
@@ -424,6 +428,7 @@ inoremap , ,<Space>
 nnoremap <BS> <C-^>
 
 map Y y$
+map 0 ^
 " Type 12<Enter> to go to line 12 (12G breaks my wrist)
 " Hit Enter to go to end of file.
 " Hit Backspace to go to beginning of file.
@@ -491,26 +496,22 @@ cnoremap <C-P>        <Up>
 "  < Alt Key Mapping > {{{1
 
 "  Alt keys ---------------------------------------------------------
-" redhat terminal sucks
-if has("lua")
-else
-    if !  g:isGUI
-        let c='a'
-        while c <= 'z'
-            exec "set <A-".c.">=\e".c
-            exec "imap \e".c." <A-".c.">"
-            let c = nr2char(1+char2nr(c))
-        endw
+if !  g:isGUI
+    let c='a'
+    while c <= 'z'
+        exec "set <A-".c.">=\e".c
+        exec "imap \e".c." <A-".c.">"
+        let c = nr2char(1+char2nr(c))
+    endw
 
-        let C='A'
-        while C <= 'Z'
-            exec "set <A-".C.">=\e".C
-            exec "imap \e".C." <A-".C.">"
-            let C = nr2char(1+char2nr(C))
-        endw
+    let C='A'
+    while C <= 'Z'
+        exec "set <A-".C.">=\e".C
+        exec "imap \e".C." <A-".C.">"
+        let C = nr2char(1+char2nr(C))
+    endw
 
-        set timeout ttimeoutlen=50
-    endif
+    set timeout ttimeoutlen=50
 endif
 " " " A-A
 " map <A-a> <Plug>NERDCommenterToggle
@@ -636,7 +637,8 @@ inoremap <A-W> <Esc>:wq<CR>
 vnoremap <A-W> <Esc>:wq<CR>
 "
 " " " A-X
-" noremap <A-x> i<space><Esc>
+nnoremap <A-x> :xa<CR>
+inoremap <A-x> <Esc>:xa<CR>
 "
 " " " A-Y
 " " sublime ctrl+shift+d
@@ -729,7 +731,7 @@ set tags=./tags
 "             << ------------ Plug Begin >> {{{1
 " Use Vim settings, rather than Vi settings (much better!).
 " This must be first, because it changes other options as a side effect.
-filetype off
+" filetype off
 
 " " for Vundle
 " if !g:iswindows
@@ -775,8 +777,8 @@ nnoremap <Space>gs :Gstatus<CR>
 nnoremap <space>gt :Gcommit -v -q %:p<CR>
 " nnoremap <space>gL :exe ':!cd ' . expand('%:p:h') . '; git la'<CR>
 " nnoremap <space>gl :exe ':!cd ' . expand('%:p:h') . '; git las'<CR>
-" nnoremap <space>gl :silent! Glog<CR>:bot copen<CR>
-nnoremap <space>gl :silent Glog<CR>
+nnoremap <space>gl :silent! Glog<CR>:bot copen<CR>
+" nnoremap <space>gl :silent Glog<CR>
 nnoremap <space>gL :silent Glog<CR>:set nofoldenable<CR>
 nnoremap <space>gr :Gread<CR>
 nnoremap <space>gw :Gwrite<CR>
@@ -789,20 +791,19 @@ nnoremap <space>g+ :Silent Git stash pop<CR>:e<CR>
 
 " }}}1
 "  < tpope/unimpaired.vim > {{{1
-
 Plug 'tpope/vim-unimpaired'
-
+" < L9 > {{{1
 Plug 'L9'
+" }}}1
+"  < rstacruz/sparkup > {{{1
 Plug 'rstacruz/sparkup', {'rtp': 'vim/'}
-" Plug 'FromtonRouge/OmniCppComplete'
-" Plug 'Lokaltog/vim-powerline'
-"Plug 'Yggdroot/indentLine'  "low speed for scrolling
+" }}}1
+"  < Align > {{{1
 Plug 'Align'
+" }}}1
+"  < junegunn/fzf > {{{1
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all'  }
 Plug 'junegunn/fzf.vim'
-
-
-
 " }}}1
 "  < terryma/vim-expand-region > {{{1
 
@@ -1104,13 +1105,15 @@ let g:syntastic_mode_map = {
 let g:syntastic_enable_perl_checker = 1
 let g:syntastic_perl_checkers = ['perl', 'perlcritic', 'podchecker']
 
-let g:syntastic_enable_vim_checker = 1
-let g:syntastic_vim_checkers = ['vimlint', 'vint']
+" let g:syntastic_enable_java_checker = 1
+" let g:syntastic_java_checker = 'javac'
+" let g:syntastic_java_javac_classpath = 'javac'
+" use eclim for java syntax check
+let g:EclimJavaValidate = 1
 
-
-" }}}1
-"  < std_c > {{{1
-
+" -----------------------------------------------------------------------------
+"  < std_c plugin >
+" -----------------------------------------------------------------------------
 Plug 'std_c.zip'
 let c_cpp_comments = 0
 
