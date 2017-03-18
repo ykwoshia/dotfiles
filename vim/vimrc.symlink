@@ -783,7 +783,7 @@ nnoremap <space>gL :silent Glog<CR>:set nofoldenable<CR>
 nnoremap <space>gr :Gread<CR>
 nnoremap <space>gw :Gwrite<CR>
 " nnoremap <space>gw :Gwrite<CR><CR>
-nnoremap <space>gp :Git push<CR>
+nnoremap <space>gp :Git push origin master<CR>
 " nnoremap <space>gp :Ggrep<Space>
 nnoremap <space>g- :Silent Git stash<CR>:e<CR>
 nnoremap <space>g+ :Silent Git stash pop<CR>:e<CR>
